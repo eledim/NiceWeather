@@ -18,7 +18,9 @@ import com.niceweather.util.Utility;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +53,17 @@ public class ChooseAreaActivity extends Activity {
 	private int currentLevel;
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(prefs.getBoolean("city_selected", false)){
+			Intent intent = new Intent (this,WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+			
+		}
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		
@@ -72,13 +85,13 @@ public class ChooseAreaActivity extends Activity {
 				}else if(currentLevel ==LEVEL_CITY){
 					selectedCity  = cityList.get(index);
 					queryCounties();
-				}//else if (currentLevel == LEVEL_COUNTY) {
-					//String countyCode = countyList.get(index).getCountyCode();
-					//Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
-					//intent.putExtra("county_code", countyCode);
-					//startActivity(intent);
-					//finish();
-				//}
+				}else if (currentLevel == LEVEL_COUNTY) {
+					String countyCode = countyList.get(index).getCountyCode();
+					Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+					intent.putExtra("county_code", countyCode);
+					startActivity(intent);
+					finish();
+				}
 			} 
 
 
@@ -164,7 +177,7 @@ public class ChooseAreaActivity extends Activity {
 				Log.d("queryFromServer onFinish", response);
 				if (result) {
 					
-					// 閫氳繃runOnUiThread()鏂规硶鍥炲埌涓荤嚎绋嬪鐞嗛�昏緫
+					//通过runOnUiThread()方法回到主线程处理逻辑
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -182,7 +195,7 @@ public class ChooseAreaActivity extends Activity {
 			}
 
 			public void onError(Exception e) {
-				// 閫氳繃runOnUiThread()鏂规硶鍥炲埌涓荤嚎绋嬪鐞嗛�昏緫
+				// 通过runOnUiThread()方法回到主线程处理逻辑
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -197,7 +210,7 @@ public class ChooseAreaActivity extends Activity {
 	private void showProgressDialog() {
 		if (progressDialog == null) {
 			progressDialog = new ProgressDialog(this);
-			progressDialog.setMessage("姝ｅ湪鍔犺浇...");
+			progressDialog.setMessage("加载中...");
 			progressDialog.setCanceledOnTouchOutside(false);
 		}
 		progressDialog.show();
@@ -213,7 +226,7 @@ public class ChooseAreaActivity extends Activity {
 	}
 	
 	/**
-	 * 鎹曡幏Back鎸夐敭锛屾牴鎹綋鍓嶇殑绾у埆鏉ュ垽鏂紝姝ゆ椂搴旇杩斿洖甯傚垪琛ㄣ�佺渷鍒楄〃銆佽繕鏄洿鎺ラ��鍑恒��
+	 * 捕获Back按键，根据当前的级别来判断，此时应该返回市列表、省列表、还是直接退出。
 	 */
 	@Override
 	public void onBackPressed() {
