@@ -12,6 +12,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class NiceWeatherDB {
 	public static final String DB_NAME = "nice_weather";
@@ -22,7 +23,7 @@ public class NiceWeatherDB {
 	private NiceWeatherDB(Context context){
 		NiceWeatherOpenHelper dbHelper = new NiceWeatherOpenHelper(context,
 				DB_NAME,null,VERSION);
-		db = dbHelper.getReadableDatabase();
+		db = dbHelper.getWritableDatabase();
 	}
 	//Java语言的关键字，当它用来修饰一个方法或者一个代码块的时候，能够保证在同一时刻最多只有一个线程执行该段代码。
 	public synchronized static NiceWeatherDB getInstance(Context context){
@@ -70,22 +71,23 @@ public class NiceWeatherDB {
 		}
 	}
 	
-	public List<City> loadCitis(int provinceId){
+	public List<City> loadCities(int provinceId) {
 		List<City> list = new ArrayList<City>();
-		Cursor cursor = db.query("City", null, "province_id=?", new String[]{String.valueOf(provinceId)},
-				null, null, null);
-		if(cursor.moveToFirst()){
-			do{
+		Cursor cursor = db.query("City", null, "province_id = ?",
+				new String[] { String.valueOf(provinceId) }, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
 				City city = new City();
 				city.setId(cursor.getInt(cursor.getColumnIndex("id")));
-				city.setCityName(cursor.getString(cursor.getColumnIndex("city_name")));
-				city.setCityCode(cursor.getString(cursor.getColumnIndex("city_code")));
+				city.setCityName(cursor.getString(cursor
+						.getColumnIndex("city_name")));
+				city.setCityCode(cursor.getString(cursor
+						.getColumnIndex("city_code")));
 				city.setProvinceId(provinceId);
 				list.add(city);
-			}while(cursor.moveToNext());
+			} while (cursor.moveToNext());
 		}
 		return list;
-		
 	}
 	
 	public void saveCounty(County county){
@@ -118,4 +120,5 @@ public class NiceWeatherDB {
 		}
 		return list;
 	}
+
 }
