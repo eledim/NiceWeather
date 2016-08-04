@@ -1,6 +1,7 @@
 package com.niceweather.app.activity;
 
 import com.niceweather.app.R;
+import com.niceweather.service.AutoUpdateService;
 import com.niceweather.util.HttpCallbackListener;
 import com.niceweather.util.HttpUtil;
 import com.niceweather.util.Utility;
@@ -28,6 +29,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	private TextView currentDateText;
 	private Button switchCity;
 	private Button refreshWeather;
+	
 	
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -152,5 +154,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityNameText.setVisibility(View.VISIBLE);
+		Intent intent = new Intent(this,AutoUpdateService.class);
+		startService(intent);
 	}
 }
